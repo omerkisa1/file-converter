@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formatCategories = {
         image: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff'],
-        document: ['pdf', 'docx'],
+        document: ['pdf', 'docx', 'pptx'],
         media: ['mp4', 'avi', 'mkv', 'mov', 'webm', 'mp3', 'wav', 'flac', 'ogg', 'aac']
     };
 
@@ -70,11 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function populateFormats(extension) {
         targetFormat.innerHTML = '<option value="">Select target format...</option>';
-        
+
         try {
             const response = await fetch(`/api/formats/${extension}`);
             const data = await response.json();
-            
+
             if (data.available_formats && data.available_formats.length > 0) {
                 data.available_formats.forEach(format => {
                     const option = document.createElement('option');
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 }
             }
-            
+
             if (category) {
                 formatCategories[category]
                     .filter(f => f !== extension)
@@ -109,21 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleFile(file) {
         if (!file) return;
-        
+
         selectedFile = file;
         hideError();
         hideSuccess();
-        
+
         fileName.textContent = file.name;
         fileSize.textContent = formatFileSize(file.size);
-        
+
         fileInfo.classList.remove('hidden');
         fileInfo.classList.add('fade-in');
         formatSection.classList.remove('hidden');
         formatSection.classList.add('fade-in');
         convertBtn.classList.remove('hidden');
         convertBtn.classList.add('fade-in');
-        
+
         const extension = getFileExtension(file.name);
         populateFormats(extension);
     }
@@ -173,13 +173,13 @@ document.addEventListener('DOMContentLoaded', () => {
         convertBtn.disabled = true;
         progressSection.classList.remove('hidden');
         progressSection.classList.add('fade-in');
-        
+
         const formData = new FormData();
         formData.append('file', selectedFile);
         formData.append('target_format', targetFormat.value);
 
         const xhr = new XMLHttpRequest();
-        
+
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 50);
@@ -192,18 +192,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (xhr.status === 200) {
                 progressBar.style.width = '100%';
                 progressPercent.textContent = '100%';
-                
+
                 const blob = xhr.response;
                 const contentDisposition = xhr.getResponseHeader('Content-Disposition');
                 let downloadFilename = `converted_${selectedFile.name.split('.')[0]}.${targetFormat.value}`;
-                
+
                 if (contentDisposition) {
                     const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
                     if (filenameMatch && filenameMatch[1]) {
                         downloadFilename = filenameMatch[1].replace(/['"]/g, '');
                     }
                 }
-                
+
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -212,9 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 a.remove();
-                
+
                 showSuccess();
-                
+
                 setTimeout(() => {
                     progressSection.classList.add('hidden');
                     convertBtn.disabled = false;
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         xhr.open('POST', '/convert');
         xhr.responseType = 'blob';
-        
+
         let fakeProgress = 50;
         const progressInterval = setInterval(() => {
             if (fakeProgress < 90) {
