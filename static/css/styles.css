@@ -1,0 +1,89 @@
+.drop-zone.drag-over {
+    border-color: rgb(167 139 250 / 0.8);
+    background-color: rgb(139 92 246 / 0.1);
+    transform: scale(1.01);
+}
+
+.drop-zone.drag-over .w-16 {
+    background: linear-gradient(135deg, rgb(124 58 237), rgb(139 92 246));
+}
+
+.drop-zone.drag-over svg {
+    color: white;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgb(139 92 246 / 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgb(139 92 246 / 0.5);
+    }
+}
+
+.converting {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+#progressBar {
+    background: linear-gradient(
+        90deg,
+        rgb(168 85 247) 0%,
+        rgb(139 92 246) 25%,
+        rgb(192 132 252) 50%,
+        rgb(139 92 246) 75%,
+        rgb(168 85 247) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+}
+
+select option {
+    background-color: rgb(30 41 59);
+    color: white;
+}
+
+::selection {
+    background-color: rgb(139 92 246 / 0.4);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(30 41 59);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(100 116 139);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(148 163 184);
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
