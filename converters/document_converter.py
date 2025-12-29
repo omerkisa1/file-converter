@@ -9,11 +9,11 @@ class DocumentConverter(BaseConverter):
     
     @property
     def supported_input_formats(self) -> List[str]:
-        return ["pdf", "docx", "pptx"]
+        return ["pdf", "docx", "pptx", "txt", "html", "md"]
     
     @property
     def supported_output_formats(self) -> List[str]:
-        return ["pdf", "docx", "pptx"]
+        return ["pdf", "docx"]
     
     def convert(self, input_path: str, output_format: str) -> str:
         input_ext = os.path.splitext(input_path)[1].lower().lstrip(".")
@@ -28,6 +28,12 @@ class DocumentConverter(BaseConverter):
             return self._docx_to_pdf(input_path, output_path)
         elif input_ext == "pptx" and output_format == "pdf":
             return self._pptx_to_pdf(input_path, output_path)
+        elif input_ext == "txt" and output_format == "pdf":
+            return self._txt_to_pdf(input_path, output_path)
+        elif input_ext == "html" and output_format == "pdf":
+            return self._html_to_pdf(input_path, output_path)
+        elif input_ext == "md" and output_format == "pdf":
+            return self._md_to_pdf(input_path, output_path)
         else:
             raise ValueError(f"Conversion from {input_ext} to {output_format} not supported")
     
@@ -127,3 +133,55 @@ class DocumentConverter(BaseConverter):
                 "Install pywin32: pip install pywin32"
             )
 
+    def _txt_to_pdf(self, input_path: str, output_path: str) -> str:
+        try:
+            from fpdf import FPDF
+        except ImportError:
+            raise RuntimeError("TXT to PDF conversion requires fpdf2: pip install fpdf2")
+        
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Helvetica", size=12)
+        
+        with open(input_path, "r", encoding="utf-8") as f:
+            for line in f:
+                pdf.multi_cell(0, 10, line.rstrip())
+        
+        pdf.output(output_path)
+        return output_path
+    
+    def _html_to_pdf(self, input_path: str, output_path: str) -> str:
+        try:
+            from weasyprint import HTML
+        except ImportError:
+            raise RuntimeError("HTML to PDF conversion requires weasyprint: pip install weasyprint")
+        
+        HTML(filename=input_path).write_pdf(output_path)
+        return output_path
+    
+    def _md_to_pdf(self, input_path: str, output_path: str) -> str:
+        try:
+            import markdown
+            from weasyprint import HTML
+        except ImportError:
+            raise RuntimeError("Markdown to PDF requires: pip install markdown weasyprint")
+        
+        with open(input_path, "r", encoding="utf-8") as f:
+            md_content = f.read()
+        
+        html_content = markdown.markdown(md_content, extensions=["tables", "fenced_code"])
+        
+        styled_html = f"""<!DOCTYPE html>
+        <html><head><meta charset="utf-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
+            code {{ background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }}
+            pre {{ background: #f4f4f4; padding: 15px; border-radius: 5px; }}
+            table {{ border-collapse: collapse; width: 100%; }}
+            th, td {{ border: 1px solid #ddd; padding: 8px; }}
+        </style></head>
+        <body>{html_content}</body></html>"""
+        
+        HTML(string=styled_html).write_pdf(output_path)
+        return output_path

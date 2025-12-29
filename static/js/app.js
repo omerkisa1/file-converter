@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedFile = null;
 
     const formatCategories = {
-        image: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff'],
-        document: ['pdf', 'docx', 'pptx'],
+        image: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff', 'ico', 'svg', 'heic', 'heif'],
+        document: ['pdf', 'docx', 'pptx', 'txt', 'html', 'md'],
         media: ['mp4', 'avi', 'mkv', 'mov', 'webm', 'mp3', 'wav', 'flac', 'ogg', 'aac']
     };
 
